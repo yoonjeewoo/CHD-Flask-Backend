@@ -55,7 +55,7 @@ def token_required(f):
       return jsonify({'message' : 'Token is missing'}), 401
     try:
       data = jwt.decode(token, app.config['SECRET_KEY'])
-      current_user = User.query.filter_by(public_id=data['public_id']).first()
+      current_user = User.query.filter_by(email=data['email']).first()
     except:
       return jsonify({'message' : 'Token is invalid!'}), 401
 
@@ -73,8 +73,8 @@ def alive():
 @token_required
 def get_all_users(current_user):
     
-  if not current_user.admin:
-    return jsonify({'message' : 'You are not admin user!'}), 401
+  # if not current_user.admin:
+  #   return jsonify({'message' : 'You are not admin user!'}), 401
 
   users = User.query.all()
 
@@ -82,30 +82,31 @@ def get_all_users(current_user):
 
   for user in users:
     user_data = {}
-    user_data['public_id'] = user.public_id
+    user_data['id'] = user.id
+    user_data['email'] = user.email
     user_data['name'] = user.name
     user_data['password'] = user.password
-    user_data['admin'] = user.admin
+    # user_data['admin'] = user.admin
     output.append(user_data)
 
   return jsonify({ 'users' : output })
 
 
-@app.route('/user/<public_id>', methods=['GET'])
+@app.route('/user/<user_id>', methods=['GET'])
 @token_required
-def get_one_users(current_user, public_id):
+def get_one_users(current_user, user_id):
 
 
-  if not current_user.admin:
-    return jsonify({'message': 'You are not admin user!'}), 401
+  # if not current_user.admin:
+  #   return jsonify({'message': 'You are not admin user!'}), 401
 
-  user = User.query.filter_by(public_id=public_id).first()
+  user = User.query.filter_by(id=user_id).first()
 
   if not user:
     return jsonify({ 'message' : 'No user found!' })
   
   user_data = {}
-  user_data['public_id'] = user.public_id
+  user_data['id'] = user.id
   user_data['name'] = user.name
   user_data['password'] = user.password
   # user_data['admin'] = user.admin
@@ -114,11 +115,8 @@ def get_one_users(current_user, public_id):
 
 
 @app.route('/user', methods=['POST'])
-# @token_required
-def create_user():
-
-  # if not current_user.admin:
-  #   return jsonify({'message': 'You are not admin user!'}), 401
+@token_required
+def create_user(current_user):
 
   data = request.get_json()
   
@@ -135,8 +133,8 @@ def create_user():
 @token_required
 def promote_user(current_user, public_id):
 
-  if not current_user.admin:
-    return jsonify({'message': 'You are not admin user!'}), 401
+  # if not current_user.admin:
+  #   return jsonify({'message': 'You are not admin user!'}), 401
 
   user = User.query.filter_by(public_id=public_id).first()
 
@@ -153,8 +151,8 @@ def promote_user(current_user, public_id):
 @token_required
 def delete_user(current_user, public_id):
 
-  if not current_user.admin:
-    return jsonify({'message': 'You are not admin user!'}), 401
+  # if not current_user.admin:
+  #   return jsonify({'message': 'You are not admin user!'}), 401
 
   user = User.query.filter_by(public_id=public_id).first()
 
