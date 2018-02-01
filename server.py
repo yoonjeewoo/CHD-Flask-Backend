@@ -1,3 +1,8 @@
+# -- coding: utf-8 --
+import sys
+reload(sys)
+sys.setdefaultencoding('utf-8')
+
 from flask import Flask, request, jsonify, make_response
 from werkzeug.security import generate_password_hash, check_password_hash
 import jwt
